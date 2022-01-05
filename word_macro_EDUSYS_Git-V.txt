@@ -1,0 +1,246 @@
+Sub SHORT_GradesReportsFixer()
+'
+' GradesReportsFixer
+' הוספת כותרת המכון לגיליון ציונים + מיספור ועיצוב טבלת ציונים
+'
+
+
+' נעילת היכולת לעדכון
+    ActiveDocument.Tables(1).Range.Select
+    Selection.Fields.Locked = True
+     
+ 'מחיקת הטורים: מזהה והיררכיה
+   ActiveDocument.Tables(1).Columns(1).Select
+   If Selection.Text Like "*היררכיה*" Then
+      Selection.Cut
+      End If
+ '   ActiveDocument.Tables(1).Columns(2).Select
+   '   Selection.Cut
+      
+      
+'תיקון השורה האחרונה "עזרה ראשונה" שמשום מה משתבשת בהדבקה
+'(יכול להיות שימושי בהקשר הזה, הוספת שורה מתחת לשורה הנבחרת): Selection.InsertRowsBelow 1
+
+
+
+'הדבקת העיצוב
+
+    
+ 'תנאי על שיעור תקשורת בין אישית לפני הדגשת נושאי קורסים
+ Dim qry As Integer
+' ActiveDocument.Tables(1).Cell(Row:=9, Column:=6).Range.Select
+'If Selection.Text Like "*תקשורת בין אישית*" Then
+'  qry = 1
+'Else
+'  qry = 0
+'End If
+
+For I = 2 To 25
+ ActiveDocument.Tables(1).Cell(Row:=I, Column:=5).Range.Select
+If Selection.Text Like "*תקשורת בין אישית*" Then
+  qry = 1
+  I = 26
+Else
+  qry = 0
+End If
+Next I
+
+   
+ 
+  'הוספת כותרת טבלה בדפי משנה
+  Selection.MoveRight Unit:=wdCharacter, Count:=6, Extend:=wdExtend
+    Selection.Rows.HeadingFormat = wdToggle
+
+
+'ActiveDocument.Tables(1).Cell(Row:=1, Column:=6).Range.Select
+' If Selection.Text Like "*קורס*" Then
+ 
+'הדגשת נושאי קורסים
+
+ 'לידע כללי: בחירת תא ספציפי     ActiveDocument.Tables(1).Cell(Row:=2, Column:=4).Range.Select
+   'מיקום סמן כך שלא ייבחר כל התא         Selection.Collapse
+   
+ 'הסבר: בחירת שורה
+      ActiveDocument.Tables(1).Rows(1).Select
+
+ 'הסבר: הדגשת תא נוכחי
+    ' הכותרת כבר מודגשת אז אין צורך: Selection.Font.Bold = wdToggle
+'הסבר: הדגשת שאר השורה
+    ' הכותרת כבר מודגשת אז אין צורך: Selection.Font.BoldBi = wdToggle
+  'הסבר: הצללת שורה
+    Selection.Shading.Texture = wdTextureNone
+    Selection.Shading.ForegroundPatternColor = wdColorAutomatic
+    Selection.Shading.BackgroundPatternColor = -603937025
+      
+      
+     
+
+' לולאה שרצה מהשורה השניה עד סוף השורות בטבלה, למשך כל עמודת הכותרות
+'
+For I = 2 To ActiveDocument.Tables(1).Rows.Count
+ ActiveDocument.Tables(1).Cell(Row:=I, Column:=6).Range.Select
+If Selection.Text Like "*לימודי חינוך*" Or Selection.Text Like "*התנסות בהוראה וחינוך*" Or Selection.Text Like "*התמחות בתושבע*" Or Selection.Text Like "*התמחות תנ*" Or Selection.Text Like "*לימודי חובה*" Then
+  ActiveDocument.Tables(1).Rows(I).Select
+       Selection.Font.Bold = wdToggle
+       Selection.Font.BoldBi = wdToggle
+        Selection.Shading.Texture = wdTextureNone
+    Selection.Shading.ForegroundPatternColor = wdColorAutomatic
+    Selection.Shading.BackgroundPatternColor = -603930625
+End If
+Next I
+ 'End If
+          
+  'מירכוז טבלה
+  Selection.Tables(1).Rows.Alignment = wdAlignRowCenter
+  Selection.Tables(1).Rows.LeftIndent = CentimetersToPoints(0)
+  
+' עיצוב טבלה: התאמה לתוכן
+  '  Selection.ActiveDocument.Tables (1)
+   ' Selection.MoveLeft Unit:=wdCharacter, Count:=1, Extend:=wdExtend
+   Selection.Tables(1).AutoFitBehavior (wdAutoFitContent)
+   Selection.Tables(1).AutoFitBehavior (wdAutoFitContent)
+  
+    
+   
+   ' עיצוב גבולות טבלה
+   'בחירת טבלה בניסיון ראשון
+ '  Selection.WholeStory
+ '   Selection.MoveLeft Unit:=wdWord, Count:=1, Extend:=wdExtend
+ 'בחירת טבלה בניסיון שני
+    ActiveDocument.Tables(1).Range.Select
+ '  Selection.Collapse
+ 
+    With Selection.Borders(wdBorderTop)
+        .LineStyle = Options.DefaultBorderLineStyle
+ '       .LineWidth = Options.DefaultBorderLineWidth
+        .Color = Options.DefaultBorderColor
+    End With
+    With Selection.Borders(wdBorderLeft)
+        .LineStyle = Options.DefaultBorderLineStyle
+ '       .LineWidth = Options.DefaultBorderLineWidth
+        .Color = Options.DefaultBorderColor
+    End With
+    With Selection.Borders(wdBorderBottom)
+        .LineStyle = Options.DefaultBorderLineStyle
+ '       .LineWidth = Options.DefaultBorderLineWidth
+        .Color = Options.DefaultBorderColor
+    End With
+    With Selection.Borders(wdBorderRight)
+        .LineStyle = Options.DefaultBorderLineStyle
+ '       .LineWidth = Options.DefaultBorderLineWidth
+        .Color = Options.DefaultBorderColor
+    End With
+    With Selection.Borders(wdBorderHorizontal)
+        .LineStyle = Options.DefaultBorderLineStyle
+ '       .LineWidth = Options.DefaultBorderLineWidth
+        .Color = Options.DefaultBorderColor
+    End With
+    With Selection.Borders(wdBorderVertical)
+        .LineStyle = Options.DefaultBorderLineStyle
+ '       .LineWidth = Options.DefaultBorderLineWidth
+        .Color = Options.DefaultBorderColor
+    End With
+    
+    'עיצוב החלק הנבחר (הטבלה) לגופן Times New Roman.  נצרך כי משום מה יש חלק מילים בעמודת שנהל שבפונט אחר (אריאל)אם כי באותו גודל כנראה
+    Selection.Font.Name = "Times New Roman"
+ 
+    
+   'הקפצת התמחות בתנך לעמוד השני
+'הגדרת משתנים. תנך למציאת השורה בה נטפל וסתנך משמש כדגל בתנאים (איפ'ים)
+ Dim tanach As Integer
+Dim m As Integer
+m = 0
+'מציאת מספר השורה של התמחות בתנך
+  For I = 2 To ActiveDocument.Tables(1).Rows.Count
+ ActiveDocument.Tables(1).Cell(Row:=I, Column:=5).Range.Select
+If Selection.Text Like "*התמחות תנ*" Then
+   tanach = I
+   m = 0
+  End If
+  If Selection.Information(wdActiveEndAdjustedPageNumber) = 1 Then
+    m = m + 1
+  End If
+ Next I
+     
+     'הגדלת השוליים עד שיתאימו וההתמחות בתנך תהיה בעמוד שני
+ 
+  If 1 <= tanach Then
+     ActiveDocument.Tables(1).Rows(tanach).Select
+       Do While Selection.Information(wdActiveEndAdjustedPageNumber) = 1
+      m = m + 1
+        With Selection.PageSetup
+        .BottomMargin = CentimetersToPoints(m * 0.4)
+       End With
+        Loop
+      
+  End If
+  
+  'תיקון תוים קופצים בטבלה
+  Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = "("
+        .Replacement.Text = "("
+        .Forward = True
+        .Wrap = wdFindContinue
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = ")"
+        .Replacement.Text = ")"
+        .Forward = True
+        .Wrap = wdFindContinue
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "'"
+        .Replacement.Text = "'"
+        .Forward = True
+        .Wrap = wdFindContinue
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "-"
+        .Replacement.Text = "-"
+        .Forward = True
+        .Wrap = wdFindContinue
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "/"
+        .Replacement.Text = "/"
+        .Forward = True
+        .Wrap = wdFindContinue
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+  
+  
+         Selection.HomeKey Unit:=wdLine
+         
+
+' Selection.Tables(1).AutoFitBehavior (wdAutoFitContent)
+' Selection.Tables(1).AutoFitBehavior (wdAutoFitContent)
+    
+ ' הודעה למשתמש על סיום הפעולה
+        MsgBox "הסתיים", vbMsgBoxRight + vbMsgBoxRtlReading, "לתשומת ליבך"
+       
+End Sub
+___________________________________
+Sub SaveStudentAsRtf()
+'
+' Macro17 
+'שמירת הקובץ בפורמט rtf
+
+'Dim StudentName As String
+'StudentName = "DDEAUTO MSAccess " + Chr(34) + "C:\\Users\\ester\\Desktop\\AF60~1\\52AF~1.ACC;Query שם מלא של תלמיד נוכחי" + Chr(34) + " FirstRow \t  \* MERGEFORMAT"
+
+ymd = Year(Now()) & Month(Now()) & Day(Now())
+'Author = InputBox("Enter name of author", "author")
+'FName = ymd & "-" & docname & "-" & Author & ".rtf"
+
+'docname = InputBox("נא להכניס את שם המסמך", "בחירת שם מסמך", StudentName)
+docname = InputBox("נא להכניס את שם המסמך", "בחירת שם מסמך")
+FName = docname & ".rtf"
+ActiveDocument.SaveAs FileName:="C:\Program Files\EduSys\Students_Reports\דוחות תלמידים\" & FName, FileFormat:=wdFormatRTF
+
+End Sub
